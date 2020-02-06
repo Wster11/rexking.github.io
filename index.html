@@ -229,6 +229,175 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://localhost:4000/2020/02/06/PureComponents和Components的区别/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Rex Wang">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="前端博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2020/02/06/PureComponents和Components的区别/" itemprop="url">PureComponents和Components的区别</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-06T15:49:15+08:00">
+                2020-02-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>React.Component和 React.PureComponent很相似，两则的区别在于，PureComponent类帮我们以浅比较的方式对比props和state，实现了shouldComponentUpdate()函数，在某些情况下，使用PureComponent可以减少render函数的执行，提升性能。</p>
+</blockquote>
+<h2 id="PureComponents能够提升性能"><a href="#PureComponents能够提升性能" class="headerlink" title="PureComponents能够提升性能"></a>PureComponents能够提升性能</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">    import React from <span class="string">'react'</span>;</span><br><span class="line"></span><br><span class="line">    class Index extends React.PureComponent&#123;</span><br><span class="line">      constructor(props) &#123;</span><br><span class="line">        super(props);</span><br><span class="line">        this.state = &#123;</span><br><span class="line">          show: <span class="literal">false</span></span><br><span class="line">        &#125;;</span><br><span class="line">        console.log(<span class="string">'constructor'</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      changeState = () =&gt; &#123;</span><br><span class="line">        this.setState(&#123;</span><br><span class="line">          show: <span class="literal">true</span></span><br><span class="line">        &#125;)</span><br><span class="line">      &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="title">render</span></span>() &#123;</span><br><span class="line">      console.log(<span class="string">'render'</span>);</span><br><span class="line">      <span class="built_in">return</span> (</span><br><span class="line">        &lt;div&gt;</span><br><span class="line">          &lt;button onClick=&#123;this.changeState&#125;&gt;Click me&lt;/button&gt;</span><br><span class="line">          &lt;div&gt;</span><br><span class="line">          &#123;this.state.show.toString()&#125;</span><br><span class="line">          &lt;/div&gt;</span><br><span class="line">        &lt;/div&gt;</span><br><span class="line">      );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="title">componentDidUpdate</span></span>() &#123;</span><br><span class="line">      console.log(<span class="string">"componentDidUpdate"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default Index;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>1.初次渲染时控制台会依次打印”constructor”、”render”;<br>  2.当第一次点击按钮更新state时，控制台会依次打印”render”、 “componentDidUpdate”;<br>  3.后续每次触发点击事件，尽管show的值没有变化，控制台还是会依次打印”render”、”componentDidUpdate”，说明组件依然调用render()、componentDidUpdate()函数，显然这是多余的，通常我们会手动重新实现shouldComponentUpdate(nextProps, nextState)函数判断state、props的状态再来决定是否需要重新渲染.</p>
+</blockquote>
+<h2 id="PureComponent默认实现的shouldComponentUpdate-方法使用的是浅比较：-即值的比较或引用的比较-不会进行深层次的对比，所以当props或state的值是引用类型时，即使对象的值改变了，但是对象的引用没变-不会触发render（会影响子组件-最好用于纯展示函数-）"><a href="#PureComponent默认实现的shouldComponentUpdate-方法使用的是浅比较：-即值的比较或引用的比较-不会进行深层次的对比，所以当props或state的值是引用类型时，即使对象的值改变了，但是对象的引用没变-不会触发render（会影响子组件-最好用于纯展示函数-）" class="headerlink" title="PureComponent默认实现的shouldComponentUpdate()方法使用的是浅比较： 即值的比较或引用的比较, 不会进行深层次的对比，所以当props或state的值是引用类型时，即使对象的值改变了，但是对象的引用没变,不会触发render（会影响子组件,最好用于纯展示函数 ）"></a>PureComponent默认实现的shouldComponentUpdate()方法使用的是浅比较： 即值的比较或引用的比较, 不会进行深层次的对比，所以当props或state的值是引用类型时，即使对象的值改变了，但是对象的引用没变,不会触发render（会影响子组件,最好用于纯展示函数 ）</h2><pre><code class="bash">
+import React from <span class="string">'react'</span>;
+
+class IndexPage extends React.PureComponent{
+  constructor(props) {
+    super(props);
+    this.state = {
+      arr: [1,2,3,4,5]
+    };
+  }
+  changeArr = () =&gt; {
+    <span class="built_in">let</span> {arr} = this.state
+    arr.pop()
+    this.setState({
+      arr
+    })
+    console.log(<span class="string">"changeArr"</span>, arr)
+  };
+  <span class="function"><span class="title">render</span></span>() {
+    const { arr } = this.state
+    console.log(<span class="string">'render'</span>, arr);
+    <span class="built_in">return</span> (
+      &lt;div&gt;
+        &lt;button onClick={this.changeArr}&gt;pop&lt;/button&gt;
+        &lt;ul&gt;
+        {
+          arr.map(item =&gt; &lt;li key={item}&gt;{item}&lt;/li&gt;)
+        }
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    );
+  }
+  <span class="function"><span class="title">componentDidUpdate</span></span>() {
+    console.log(<span class="string">"componentDidUpdate"</span>)
+  }
+}
+
+<span class="built_in">export</span> default IndexPage;
+
+</code></pre>
+<blockquote>
+<p>1.当这个this.state.arr是一个数组时，且这个组件是继承自PureComponent时，初始化依旧是输出constructor和render，但是当点击按钮时，界面上没有变化,虽然数组的值发生变化，但是浅比较引用相同,不会触发页面更新。<br>2.但是当这个组件是继承自Component的时候，初始化依旧是输出constructor和render，但是当点击按钮时，界面上出现了变化，即我们打印处理的arr的值输出，而且每点击一次按钮都会输出一次render，证明已经重新渲染，this.state.arr的值已经更新，所以我们能在界面上看到这个变化<br>3.使用扩展运算符产生新数组，使this.state.arr的引用发生了变化，所以初始化的时候输出constructor和render后，每次点击按钮都会输出render，界面也会变化，不管该组件是继承自Component还是PureComponent的</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://localhost:4000/2019/09/11/带你了解Set与Map/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -904,7 +1073,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -912,6 +1081,15 @@
 
             
 
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
             
 
           </nav>
@@ -945,7 +1123,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
